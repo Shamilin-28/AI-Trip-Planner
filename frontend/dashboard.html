@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Dashboard — AI Trip Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--cyan:#06b6d4;--cyan2:#22d3ee;--bg:#060d1f;--card:#0f1d35;--border:rgba(255,255,255,0.07);--muted:#64748b;--muted2:#94a3b8;--green:#22c55e}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:#f8fafc;min-height:100vh;display:flex;flex-direction:column}
+    h1,h2,h3{font-family:'Outfit',sans-serif}
+    a{text-decoration:none;color:inherit}
+    
+    nav{display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:rgba(6,13,31,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .logo{display:flex;align-items:center;gap:8px;font-family:'Outfit',sans-serif;font-weight:700;font-size:18px;color:var(--cyan)}
+    .nav-links{display:flex;gap:32px}
+    .nav-links a{color:var(--muted2);font-size:14px;transition:color .2s}
+    .nav-links a:hover,.nav-links a.active{color:var(--cyan)}
+    
+    .page-inner{flex:1;max-width:1100px;margin:0 auto;padding:48px 40px;width:100%}
+    .page-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px}
+    .page-top h1{font-size:36px;font-weight:800;display:flex;align-items:center;gap:12px}
+    .trip-count{background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);color:var(--cyan);padding:4px 14px;border-radius:50px;font-size:14px;font-weight:600}
+    
+    .btn-primary{background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#060d1f;font-weight:700;border:none;border-radius:10px;padding:11px 24px;cursor:pointer;font-size:14px;transition:opacity .2s}
+    .clear-all{background:transparent;border:1px solid rgba(239,68,68,0.3);color:rgba(239,68,68,0.7);padding:10px 18px;border-radius:10px;cursor:pointer;font-size:13px;transition:all .2s}
+    .clear-all:hover{border-color:#ef4444;color:#ef4444}
+
+    /* Empty state */
+    .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 20px;text-align:center}
+    .empty-icons{font-size:56px;margin-bottom:28px}
+
+    /* Trip cards */
+    .trips-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px}
+    .trip-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;transition:all 0.3s ease;display:flex;flex-direction:column}
+    .trip-card:hover{border-color:var(--cyan);transform:translateY(-5px);box-shadow:0 10px 30px rgba(0,0,0,0.4)}
+    
+    .trip-dest{font-size:22px;font-weight:800;color:var(--cyan2);margin-bottom:6px}
+    .trip-meta{color:var(--muted2);font-size:13px;margin-bottom:18px;display:flex;flex-direction:column;gap:4px}
+    .meta-line{display:flex;align-items:center;gap:6px}
+    
+    .trip-tags{display:flex;gap:8px;margin-bottom:20px}
+    .trip-tag{background:rgba(255,255,255,0.05);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;color:var(--muted2);border:1px solid var(--border)}
+    
+    .trip-preview{background:rgba(0,0,0,0.2);border-radius:10px;padding:12px;font-size:12px;color:var(--muted2);margin-bottom:20px;max-height:80px;overflow:hidden;line-height:1.5;position:relative}
+    .trip-preview::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:30px;background:linear-gradient(transparent, var(--card))}
+
+    .trip-actions{display:flex;gap:10px;margin-top:auto}
+    .btn-view{flex:1;background:var(--cyan);color:#060d1f;font-weight:700;border:none;border-radius:8px;padding:10px;cursor:pointer;font-size:13px}
+    .btn-del{background:rgba(239,68,68,0.1);color:#fca5a5;border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:10px 14px;cursor:pointer}
+    .btn-del:hover{background:#ef4444;color:#fff}
+
+    .saved-date{font-size:10px;color:var(--muted);margin-top:15px;text-transform:uppercase;letter-spacing:1px}
+
+    footer{background:#050b17;border-top:1px solid var(--border);padding:32px 40px;display:flex;justify-content:space-between;align-items:center;margin-top:auto}
+    @media(max-width:600px){.nav-links{display:none}.page-inner{padding:32px 20px}}
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">✈️ AI Trip Planner</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="dashboard.html" class="active">Dashboard</a>
+      <a href="about.html">About</a>
+    </div>
+  </nav>
+
+  <div class="page-inner">
+    <div class="page-top">
+      <h1>My Adventures <span class="trip-count" id="count-badge">0</span></h1>
+      <div id="top-actions">
+        <button class="btn-primary" onclick="window.location.href='planner.html'">+ Plan New Trip</button>
+      </div>
+    </div>
+    <div id="trips-content"></div>
+  </div>
+
+  <footer>
+    <div class="logo" style="font-size:15px">✈️ AI Trip Planner</div>
+    <div style="display:flex;gap:24px">
+      <a href="index.html" style="color:var(--muted);font-size:13px">Home</a>
+      <a href="dashboard.html" style="color:var(--muted);font-size:13px">Dashboard</a>
+    </div>
+  </footer>
+
+  <script>
+    function render(){
+      // Using the same key used in itinerary.html
+      const trips = JSON.parse(localStorage.getItem('savedItineraries') || '[]');
+      const badge = document.getElementById('count-badge');
+      badge.textContent = trips.length;
+      const content = document.getElementById('trips-content');
+      const topActions = document.getElementById('top-actions');
+
+      if(!trips.length){
+        content.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icons">🏜️ ✈️</div>
+            <h2>Your travel log is empty</h2>
+            <p>Once you generate and save an itinerary, it will appear here.</p>
+            <button class="btn-primary" style="padding:14px 40px" onclick="window.location.href='planner.html'">Start Planning</button>
+          </div>`;
+        return;
+      }
+
+      // Add Clear All button if trips exist
+      topActions.innerHTML = `
+        <button class="clear-all" onclick="clearAll()" style="margin-right:10px">🗑 Clear All</button>
+        <button class="btn-primary" onclick="window.location.href='planner.html'">+ Plan New Trip</button>
+      `;
+
+      content.innerHTML = `<div class="trips-grid">${trips.map((t, i) => `
+        <div class="trip-card">
+          <div class="trip-dest">${t.destination}</div>
+          <div class="trip-meta">
+            <div class="meta-line">🏠 From: ${t.origin}</div>
+            <div class="meta-line">📅 ${t.dates || t.days + ' Days'}</div>
+          </div>
+          <div class="trip-tags">
+            <span class="trip-tag">💰 ${t.budget}</span>
+            <span class="trip-tag">🕒 ${t.days} Days</span>
+          </div>
+          <div class="trip-preview">${t.content.substring(0, 150).replace(/[#*`]/g, '')}...</div>
+          <div class="trip-actions">
+            <button class="btn-view" onclick="viewTrip(${i})">📄 View Itinerary</button>
+            <button class="btn-del" onclick="deleteTrip(${i})">🗑</button>
+          </div>
+          <div class="saved-date">Logged on ${t.timestamp}</div>
+        </div>
+      `).reverse().join('')}</div>`; // Reverse so newest is first
+    }
+
+    function viewTrip(index) {
+      const trips = JSON.parse(localStorage.getItem('savedItineraries') || '[]');
+      const trip = trips[index];
+      
+      // We pass the saved content to the itinerary page via a temporary session storage
+      // or we can modify itinerary.html to check for a "view" flag.
+      // For simplicity, let's store the specific content to be "re-rendered"
+      localStorage.setItem('viewingSavedTrip', JSON.stringify(trip));
+      window.location.href = 'view-itinerary.html'; // Or you can point back to itinerary.html with a flag
+    }
+
+    function deleteTrip(i){
+      const trips = JSON.parse(localStorage.getItem('savedItineraries') || '[]');
+      // Need to handle index correctly if reversed
+      const actualIndex = trips.length - 1 - i; 
+      if(confirm('Delete this trip?')) {
+        trips.splice(actualIndex, 1);
+        localStorage.setItem('savedItineraries', JSON.stringify(trips));
+        render();
+      }
+    }
+
+    function clearAll(){
+      if(confirm('Delete all saved trips permanently?')){
+        localStorage.removeItem('savedItineraries');
+        render();
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>

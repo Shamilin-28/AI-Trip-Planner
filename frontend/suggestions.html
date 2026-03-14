@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Suggestions — AI Trip Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--cyan:#06b6d4;--cyan2:#22d3ee;--bg:#060d1f;--bg2:#0a1628;--card:#0f1d35;--border:rgba(255,255,255,0.07);--muted:#64748b;--muted2:#94a3b8}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:#f8fafc;min-height:100vh}
+    h1,h2,h3,h4{font-family:'Outfit',sans-serif}
+    a{text-decoration:none;color:inherit}
+    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:rgba(6,13,31,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .logo{display:flex;align-items:center;gap:8px;font-family:'Outfit',sans-serif;font-weight:700;font-size:18px;color:var(--cyan)}
+    .nav-links{display:flex;gap:32px}
+    .nav-links a{color:var(--muted2);font-size:14px;transition:color .2s}
+    .nav-links a:hover,.nav-links a.active{color:var(--cyan)}
+    .page-header{text-align:center;padding:60px 24px 40px;background:radial-gradient(ellipse at 50% 0%,rgba(6,182,212,0.08) 0%,transparent 60%)}
+    .page-header h1{font-size:clamp(32px,5vw,52px);font-weight:800;margin-bottom:12px}
+    .page-header h1 span{background:linear-gradient(90deg,var(--cyan),var(--cyan2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .page-header p{color:var(--muted2);font-size:16px}
+    .filter-bar{max-width:1100px;margin:0 auto;padding:28px 40px;background:var(--card);border:1px solid var(--border);border-radius:20px;margin-bottom:40px}
+    .filter-section{margin-bottom:20px}
+    .filter-section:last-child{margin-bottom:0}
+    .filter-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+    .mood-pills{display:flex;flex-wrap:wrap;gap:8px}
+    .mood-pill{border:1px solid var(--border);color:var(--muted2);padding:7px 16px;border-radius:50px;font-size:13px;cursor:pointer;transition:all .2s;background:transparent;font-family:'Inter',sans-serif}
+    .mood-pill.active,.mood-pill:hover{background:rgba(6,182,212,0.15);border-color:var(--cyan);color:var(--cyan2)}
+    .budget-row{display:flex;align-items:center;gap:20px}
+    .budget-row input[type=range]{flex:1;accent-color:var(--cyan);height:4px;cursor:pointer}
+    .budget-val{font-family:'Outfit',sans-serif;font-weight:700;color:var(--cyan);font-size:18px;min-width:100px;text-align:right}
+    .dur-pills{display:flex;gap:8px}
+    .dur-pill{border:1px solid var(--border);color:var(--muted2);padding:7px 16px;border-radius:50px;font-size:13px;cursor:pointer;transition:all .2s;background:transparent;font-family:'Inter',sans-serif}
+    .dur-pill.active{background:rgba(6,182,212,0.15);border-color:var(--cyan);color:var(--cyan2)}
+    .results-count{max-width:1100px;margin:0 auto 24px;padding:0 0 0 4px;color:var(--muted2);font-size:15px}
+    .results-count b{color:var(--cyan)}
+    .dest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1100px;margin:0 auto;padding-bottom:60px}
+    .dest-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .25s,border-color .25s}
+    .dest-card:hover{transform:translateY(-5px);border-color:rgba(6,182,212,0.3)}
+    .card-img{height:150px;display:flex;align-items:center;justify-content:center;font-size:64px;position:relative;flex-shrink:0}
+    .mood-badge{position:absolute;top:10px;right:10px;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:600;font-family:'Outfit',sans-serif}
+    .card-body{padding:18px;flex:1;display:flex;flex-direction:column}
+    .card-name{font-size:20px;font-weight:700;margin-bottom:2px}
+    .card-country{color:var(--muted);font-size:12px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px}
+    .card-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .tag{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--muted2)}
+    .tag b{color:var(--cyan2)}
+    .attractions-label{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+    .attractions-list{list-style:none;margin-bottom:16px;flex:1}
+    .attractions-list li{font-size:13px;color:var(--muted2);padding:3px 0;display:flex;align-items:center;gap:6px}
+    .attractions-list li::before{content:'📍';font-size:11px}
+    .card-actions{display:flex;gap:8px;margin-top:auto}
+    .btn-plan{flex:1;background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#060d1f;font-weight:700;border:none;border-radius:10px;padding:11px;cursor:pointer;font-size:13px;font-family:'Outfit',sans-serif;transition:opacity .2s}
+    .btn-plan:hover{opacity:.9}
+    .btn-weather{background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--muted2);border-radius:10px;padding:11px 14px;cursor:pointer;font-size:13px;transition:all .2s;white-space:nowrap;font-family:'Inter',sans-serif}
+    .btn-weather:hover{border-color:var(--cyan);color:var(--cyan)}
+    .weather-panel{background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.15);border-radius:10px;padding:14px;margin-top:12px;font-size:13px;display:none}
+    .weather-panel.show{display:block}
+    .weather-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .weather-temp{font-family:'Outfit',sans-serif;font-size:24px;font-weight:700;color:var(--cyan)}
+    .weather-cond{color:var(--muted2);font-size:12px}
+    .weather-detail{display:flex;gap:16px;color:var(--muted2);font-size:12px}
+    .no-results{text-align:center;padding:80px 20px;color:var(--muted2)}
+    .no-results h3{font-size:24px;color:var(--muted2);margin-bottom:8px}
+    .main-wrap{padding:0 40px}
+    @media(max-width:900px){.dest-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:600px){.dest-grid{grid-template-columns:1fr}.nav-links{display:none}.filter-bar,.results-count,.dest-grid{padding:20px}.main-wrap{padding:0 16px}.dur-pills{flex-wrap:wrap}}
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">✈️ AI Trip Planner</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="suggestions.html" class="active">Suggestions</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="about.html">About</a>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <h1>Find Your Next <span>Adventure</span> 🌍</h1>
+    <p>Filter by mood, budget, and duration to discover your perfect destination</p>
+  </div>
+
+  <div class="main-wrap">
+    <div class="filter-bar">
+      <div class="filter-section">
+        <div class="filter-label">Mood</div>
+        <div class="mood-pills">
+          <button class="mood-pill active" onclick="setMood('All',this)">🌐 All</button>
+          <button class="mood-pill" onclick="setMood('Relaxing',this)">😌 Relaxing</button>
+          <button class="mood-pill" onclick="setMood('Adventure',this)">⛺ Adventure</button>
+          <button class="mood-pill" onclick="setMood('Cultural',this)">🏛️ Cultural</button>
+          <button class="mood-pill" onclick="setMood('Romantic',this)">💑 Romantic</button>
+          <button class="mood-pill" onclick="setMood('Budget',this)">💰 Budget</button>
+          <button class="mood-pill" onclick="setMood('Luxury',this)">👑 Luxury</button>
+        </div>
+      </div>
+      <div class="filter-section">
+        <div class="filter-label">Max Budget</div>
+        <div class="budget-row">
+          <input type="range" id="budget-slider" min="30000" max="500000" step="10000" value="500000" oninput="setBudget(this.value)"/>
+          <span class="budget-val" id="budget-label">₹5,00,000</span>
+        </div>
+      </div>
+      <div class="filter-section">
+        <div class="filter-label">Duration</div>
+        <div class="dur-pills">
+          <button class="dur-pill active" onclick="setDuration('Any',this)">🌐 Any</button>
+          <button class="dur-pill" onclick="setDuration('Weekend',this)">🌙 Weekend</button>
+          <button class="dur-pill" onclick="setDuration('1 Week',this)">📅 1 Week</button>
+          <button class="dur-pill" onclick="setDuration('2 Weeks',this)">🗓️ 2 Weeks</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-count" id="results-count">Showing <b id="count">12</b> of <b>12</b> destinations</div>
+    <div class="dest-grid" id="dest-grid"></div>
+  </div>
+
+  <footer style="background:#050b17;border-top:1px solid var(--border);padding:32px 40px;display:flex;justify-content:space-between;align-items:center">
+    <div class="logo" style="font-size:15px">✈️ AI Trip Planner</div>
+    <div style="display:flex;gap:24px">
+      <a href="index.html" style="color:var(--muted);font-size:13px">Home</a>
+      <a href="suggestions.html" style="color:var(--muted);font-size:13px">Suggestions</a>
+      <a href="dashboard.html" style="color:var(--muted);font-size:13px">Dashboard</a>
+      <a href="about.html" style="color:var(--muted);font-size:13px">About</a>
+    </div>
+  </footer>
+
+<script>
+const DESTINATIONS = [
+  {id:1,name:"Paris",country:"France",flag:"🇫🇷",emoji:"🗼",moods:["Romantic","Cultural"],budgetMin:80000,budgetMax:150000,season:"Apr–Jun, Sep–Nov",durations:["1 Week","2 Weeks"],attractions:["Eiffel Tower","Louvre Museum","Champs-Élysées"],lat:48.8566,lon:2.3522,bg:"linear-gradient(135deg,#1a237e,#283593)",moodColor:"#ec4899",desc:"The eternal city of romance, art and gastronomy"},
+  {id:2,name:"Bali",country:"Indonesia",flag:"🇮🇩",emoji:"🌺",moods:["Relaxing","Adventure"],budgetMin:40000,budgetMax:90000,season:"Apr–Oct",durations:["Weekend","1 Week"],attractions:["Tanah Lot Temple","Ubud Rice Terraces","Seminyak Beach"],lat:-8.3405,lon:115.0920,bg:"linear-gradient(135deg,#065f46,#059669)",moodColor:"#10b981",desc:"Tropical paradise with ancient temples and lush rice fields"},
+  {id:3,name:"Tokyo",country:"Japan",flag:"🇯🇵",emoji:"⛩️",moods:["Cultural","Adventure"],budgetMin:100000,budgetMax:200000,season:"Mar–May, Sep–Nov",durations:["1 Week","2 Weeks"],attractions:["Senso-ji Temple","Shibuya Crossing","Tsukiji Market"],lat:35.6762,lon:139.6503,bg:"linear-gradient(135deg,#b45309,#d97706)",moodColor:"#f59e0b",desc:"Where ancient tradition meets cutting-edge modernity"},
+  {id:4,name:"Dubai",country:"UAE",flag:"🇦🇪",emoji:"🏙️",moods:["Luxury","Adventure"],budgetMin:150000,budgetMax:300000,season:"Nov–Mar",durations:["Weekend","1 Week"],attractions:["Burj Khalifa","Dubai Mall","Palm Jumeirah"],lat:25.2048,lon:55.2708,bg:"linear-gradient(135deg,#7c3aed,#a855f7)",moodColor:"#a855f7",desc:"Futuristic skylines and desert adventures in one place"},
+  {id:5,name:"Bangkok",country:"Thailand",flag:"🇹🇭",emoji:"🛕",moods:["Cultural","Budget"],budgetMin:30000,budgetMax:70000,season:"Nov–Feb",durations:["Weekend","1 Week"],attractions:["Wat Pho","Grand Palace","Chatuchak Market"],lat:13.7563,lon:100.5018,bg:"linear-gradient(135deg,#065f46,#10b981)",moodColor:"#10b981",desc:"Vibrant street food, ornate temples, and energetic nightlife"},
+  {id:6,name:"Switzerland",country:"Switzerland",flag:"🇨🇭",emoji:"🏔️",moods:["Adventure","Luxury"],budgetMin:200000,budgetMax:400000,season:"Jun–Sep, Dec–Feb",durations:["1 Week","2 Weeks"],attractions:["Matterhorn","Lake Geneva","Interlaken"],lat:46.8182,lon:8.2275,bg:"linear-gradient(135deg,#1e3a5f,#1d4ed8)",moodColor:"#3b82f6",desc:"Alpine peaks, pristine lakes, and luxury at its finest"},
+  {id:7,name:"New York",country:"USA",flag:"🇺🇸",emoji:"🗽",moods:["Cultural","Adventure"],budgetMin:120000,budgetMax:250000,season:"Apr–Jun, Sep–Nov",durations:["Weekend","1 Week"],attractions:["Times Square","Central Park","Statue of Liberty"],lat:40.7128,lon:-74.0060,bg:"linear-gradient(135deg,#374151,#4b5563)",moodColor:"#6b7280",desc:"The city that never sleeps — culture, art, and relentless energy"},
+  {id:8,name:"Maldives",country:"Maldives",flag:"🇲🇻",emoji:"🏝️",moods:["Relaxing","Luxury","Romantic"],budgetMin:200000,budgetMax:500000,season:"Nov–Apr",durations:["Weekend","1 Week"],attractions:["Overwater Villas","Coral Reefs","Sunset Cruises"],lat:3.2028,lon:73.2207,bg:"linear-gradient(135deg,#0e7490,#06b6d4)",moodColor:"#06b6d4",desc:"Overwater paradise with crystal-clear turquoise lagoons"},
+  {id:9,name:"Santorini",country:"Greece",flag:"🇬🇷",emoji:"🌅",moods:["Romantic","Relaxing"],budgetMin:100000,budgetMax:220000,season:"May–Oct",durations:["Weekend","1 Week"],attractions:["Oia Sunset","Caldera Views","Akrotiri Ruins"],lat:36.3932,lon:25.4615,bg:"linear-gradient(135deg,#1e40af,#3b82f6)",moodColor:"#ec4899",desc:"Iconic white-washed clifftop villages and volcanic sunsets"},
+  {id:10,name:"Nairobi",country:"Kenya",flag:"🇰🇪",emoji:"🦁",moods:["Adventure","Cultural"],budgetMin:80000,budgetMax:180000,season:"Jun–Oct",durations:["1 Week","2 Weeks"],attractions:["Maasai Mara","Nairobi National Park","Giraffe Centre"],lat:-1.2921,lon:36.8219,bg:"linear-gradient(135deg,#78350f,#d97706)",moodColor:"#f59e0b",desc:"Gateway to Africa's greatest wildlife safaris"},
+  {id:11,name:"Barcelona",country:"Spain",flag:"🇪🇸",emoji:"🎭",moods:["Cultural","Relaxing","Romantic"],budgetMin:70000,budgetMax:150000,season:"Apr–Jun, Sep–Oct",durations:["Weekend","1 Week"],attractions:["Sagrada Família","Park Güell","Las Ramblas"],lat:41.3851,lon:2.1734,bg:"linear-gradient(135deg,#831843,#be185d)",moodColor:"#ec4899",desc:"Gaudí's masterpieces, beaches, and vibrant nightlife"},
+  {id:12,name:"Kyoto",country:"Japan",flag:"🇯🇵",emoji:"🏯",moods:["Cultural","Relaxing"],budgetMin:80000,budgetMax:160000,season:"Mar–May, Oct–Nov",durations:["1 Week","2 Weeks"],attractions:["Fushimi Inari","Arashiyama Bamboo","Kinkaku-ji"],lat:35.0116,lon:135.7681,bg:"linear-gradient(135deg,#881337,#e11d48)",moodColor:"#f43f5e",desc:"Ancient temples, geisha districts, and zen gardens"},
+];
+
+const WMO={0:"☀️ Clear sky",1:"🌤 Mainly clear",2:"⛅ Partly cloudy",3:"☁️ Overcast",45:"🌫 Foggy",51:"🌦 Light drizzle",61:"🌧 Slight rain",63:"🌧 Moderate rain",80:"🌦 Rain showers",95:"⛈ Thunderstorm"};
+
+let activeMood='All', activeBudget=500000, activeDuration='Any';
+
+function setMood(mood,el){
+  document.querySelectorAll('.mood-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  activeMood=mood;
+  render();
+}
+function setBudget(val){
+  activeBudget=parseInt(val);
+  document.getElementById('budget-label').textContent='₹'+parseInt(val).toLocaleString('en-IN');
+  render();
+}
+function setDuration(dur,el){
+  document.querySelectorAll('.dur-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  activeDuration=dur;
+  render();
+}
+
+function filtered(){
+  return DESTINATIONS.filter(d=>{
+    if(activeMood!=='All'&&!d.moods.includes(activeMood))return false;
+    if(d.budgetMin>activeBudget)return false;
+    if(activeDuration!=='Any'&&!d.durations.includes(activeDuration))return false;
+    return true;
+  });
+}
+
+function render(){
+  const list=filtered();
+  document.getElementById('count').textContent=list.length;
+  const grid=document.getElementById('dest-grid');
+  if(!list.length){
+    grid.innerHTML=`<div class="no-results" style="grid-column:1/-1"><h3>😕 No destinations match</h3><p>Try adjusting your filters</p></div>`;
+    return;
+  }
+  grid.innerHTML=list.map(d=>`
+    <div class="dest-card" id="card-${d.id}">
+      <div class="card-img" style="background:${d.bg}">
+        ${d.emoji}
+        <div class="mood-badge" style="background:${d.moodColor}22;border:1px solid ${d.moodColor}55;color:${d.moodColor}">${d.moods[0]}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">${d.name}</div>
+        <div class="card-country">${d.flag} ${d.country}</div>
+        <div class="card-tags">
+          <span class="tag">💰 <b>₹${(d.budgetMin/1000).toFixed(0)}K–₹${(d.budgetMax/1000).toFixed(0)}K</b></span>
+          <span class="tag">📅 ${d.season}</span>
+        </div>
+        <div class="attractions-label">Top Attractions</div>
+        <ul class="attractions-list">
+          ${d.attractions.map(a=>`<li>${a}</li>`).join('')}
+        </ul>
+        <div class="card-actions">
+          <button class="btn-plan" onclick="planThis('${d.name}, ${d.country}')">Plan This Trip ✈️</button>
+          <button class="btn-weather" id="wbtn-${d.id}" onclick="toggleWeather(${d.id},${d.lat},${d.lon})">🌤 Weather</button>
+        </div>
+        <div class="weather-panel" id="wpanel-${d.id}"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function toggleWeather(id,lat,lon){
+  const panel=document.getElementById('wpanel-'+id);
+  const btn=document.getElementById('wbtn-'+id);
+  if(panel.classList.contains('show')){panel.classList.remove('show');btn.textContent='🌤 Weather';return;}
+  btn.textContent='⏳ Loading...';
+  try{
+    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=auto`);
+    const d=await r.json();
+    const c=d.current;
+    const cond=WMO[c.weather_code]||'🌡 Variable';
+    panel.innerHTML=`
+      <div class="weather-row">
+        <div><div class="weather-temp">${Math.round(c.temperature_2m)}°C</div><div class="weather-cond">${cond}</div></div>
+        <div style="text-align:right;color:var(--muted2);font-size:12px">Live from<br/>Open-Meteo</div>
+      </div>
+      <div class="weather-detail">
+        <span>💧 ${c.relative_humidity_2m}% humidity</span>
+        <span>💨 ${Math.round(c.wind_speed_10m)} km/h wind</span>
+      </div>`;
+    panel.classList.add('show');
+    btn.textContent='❌ Close';
+  }catch(e){
+    panel.innerHTML=`<div style="color:var(--muted2);font-size:12px">Could not fetch weather</div>`;
+    panel.classList.add('show');
+    btn.textContent='❌ Close';
+  }
+}
+
+function planThis(dest){
+  window.location.href='planner.html?dest='+encodeURIComponent(dest);
+}
+
+render();
+</script>
+</body>
+</html>

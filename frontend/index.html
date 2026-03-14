@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Trip Planner — Plan Smarter. Travel Better.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--cyan:#06b6d4;--cyan2:#22d3ee;--bg:#060d1f;--bg2:#0a1628;--card:#0f1d35;--card2:#142240;--border:rgba(255,255,255,0.07);--muted:#64748b;--muted2:#94a3b8}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:#f8fafc;min-height:100vh;overflow-x:hidden}
+    h1,h2,h3,h4,nav .logo{font-family:'Outfit',sans-serif}
+    a{text-decoration:none;color:inherit}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:rgba(6,13,31,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;color:var(--cyan)}
+    .nav-links{display:flex;gap:32px}
+    .nav-links a{color:var(--muted2);font-size:14px;transition:color .2s}
+    .nav-links a:hover,.nav-links a.active{color:var(--cyan)}
+
+    /* HERO */
+    .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;background:radial-gradient(ellipse at 50% 20%, #0a2a4a 0%, #060d1f 60%);position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 80%,rgba(6,182,212,0.07) 0%,transparent 55%),radial-gradient(ellipse at 20% 50%,rgba(6,182,212,0.05) 0%,transparent 50%);pointer-events:none}
+    .particle{position:absolute;width:2px;height:2px;background:var(--cyan);border-radius:50%;opacity:.4;animation:float var(--d,8s) ease-in-out infinite;animation-delay:var(--delay,0s)}
+    @keyframes float{0%,100%{transform:translateY(0) translateX(0);opacity:.4}50%{transform:translateY(-40px) translateX(20px);opacity:.8}}
+    .badge{display:inline-flex;align-items:center;gap:8px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);color:var(--cyan2);padding:7px 20px;border-radius:50px;font-size:13px;margin-bottom:28px;letter-spacing:.3px}
+    .hero h1{font-size:clamp(44px,7vw,80px);font-weight:900;line-height:1.05;margin-bottom:24px}
+    .hero h1 .hl{background:linear-gradient(90deg,var(--cyan),var(--cyan2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero p{color:var(--muted2);font-size:17px;max-width:520px;line-height:1.75;margin-bottom:44px}
+    .search-wrap{display:flex;background:rgba(255,255,255,0.05);border:1.5px solid rgba(6,182,212,0.3);border-radius:60px;padding:6px 6px 6px 24px;max-width:560px;width:100%;margin-bottom:56px;transition:border-color .2s}
+    .search-wrap:focus-within{border-color:rgba(6,182,212,0.6)}
+    .search-wrap input{flex:1;background:transparent;border:none;color:#fff;font-size:15px;outline:none;font-family:'Inter',sans-serif}
+    .search-wrap input::placeholder{color:var(--muted)}
+    .btn-primary{background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#060d1f;font-weight:700;border:none;border-radius:50px;padding:13px 28px;cursor:pointer;font-size:14px;font-family:'Outfit',sans-serif;transition:opacity .2s,transform .15s;white-space:nowrap}
+    .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+    .stats{display:flex;gap:56px;flex-wrap:wrap;justify-content:center}
+    .stat .num{font-family:'Outfit',sans-serif;font-size:32px;font-weight:800;color:var(--cyan);line-height:1}
+    .stat .lbl{font-size:11px;color:var(--muted);letter-spacing:1.8px;text-transform:uppercase;margin-top:6px}
+
+    /* SECTIONS */
+    .section{padding:80px 40px;max-width:1200px;margin:0 auto}
+    .sec-title{text-align:center;margin-bottom:52px}
+    .sec-title h2{font-size:38px;font-weight:700;margin-bottom:12px}
+    .sec-title p{color:var(--muted2);font-size:16px}
+    .cyan{color:var(--cyan)}
+
+    /* STEPS */
+    .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+    .step-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px 24px;transition:border-color .2s}
+    .step-card:hover{border-color:rgba(6,182,212,0.25)}
+    .step-icon{font-size:28px;margin-bottom:16px}
+    .step-num{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+    .step-card h3{font-size:16px;font-weight:600;margin-bottom:8px}
+    .step-card p{color:var(--muted2);font-size:13px;line-height:1.65}
+
+    /* DEST CARDS */
+    .dest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+    .dest-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:transform .25s,border-color .25s;cursor:pointer}
+    .dest-card:hover{transform:translateY(-6px);border-color:rgba(6,182,212,0.3)}
+    .dest-img{height:150px;display:flex;align-items:center;justify-content:center;font-size:60px}
+    .dest-body{padding:18px}
+    .dest-body h3{font-size:18px;font-weight:700;margin-bottom:4px}
+    .dest-body p{color:var(--muted2);font-size:13px;margin-bottom:14px}
+
+    /* DATA STRIP */
+    .data-strip{background:rgba(6,182,212,0.05);border-top:1px solid rgba(6,182,212,0.12);border-bottom:1px solid rgba(6,182,212,0.12);padding:16px 40px;display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
+    .data-strip span{color:var(--muted2);font-size:12px;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+    .data-strip span::before{content:'';width:6px;height:6px;background:var(--cyan);border-radius:50%;display:inline-block}
+
+    /* CTA SECTION */
+    .cta-section{text-align:center;padding:80px 40px;background:radial-gradient(ellipse at 50% 100%,rgba(6,182,212,0.08) 0%,transparent 70%)}
+    .cta-section h2{font-size:40px;font-weight:800;margin-bottom:16px}
+    .cta-section p{color:var(--muted2);font-size:16px;margin-bottom:32px}
+
+    /* FOOTER */
+    footer{background:#050b17;border-top:1px solid var(--border);padding:40px}
+    .footer-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:32px}
+    .footer-links{display:flex;gap:28px}
+    .footer-links a{color:var(--muted);font-size:13px;transition:color .2s}
+    .footer-links a:hover{color:white}
+    .footer-copy{max-width:1200px;margin:24px auto 0;padding-top:24px;border-top:1px solid var(--border);text-align:center;color:var(--muted);font-size:12px}
+
+    @media(max-width:900px){.steps-grid{grid-template-columns:repeat(2,1fr)}.dest-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:600px){.steps-grid,.dest-grid{grid-template-columns:1fr}.nav-links{display:none}.stats{gap:28px}.section{padding:60px 20px}}
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">✈️ AI Trip Planner</a>
+    <div class="nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="about.html">About</a>
+    </div>
+  </nav>
+
+  <!-- Particles -->
+  <div class="hero" id="hero">
+    <span class="particle" style="top:15%;left:10%;--d:9s;--delay:0s"></span>
+    <span class="particle" style="top:25%;left:85%;--d:7s;--delay:1s"></span>
+    <span class="particle" style="top:70%;left:15%;--d:11s;--delay:2s"></span>
+    <span class="particle" style="top:60%;left:75%;--d:8s;--delay:.5s"></span>
+    <span class="particle" style="top:40%;left:50%;--d:10s;--delay:3s"></span>
+    <span class="particle" style="top:80%;left:60%;--d:6s;--delay:1.5s"></span>
+    <span class="particle" style="top:10%;left:40%;--d:12s;--delay:4s"></span>
+
+    <div class="badge">🤖 Powered by AI Agents &amp; Real-Time Data</div>
+    <h1>Plan Smarter.<br/><span class="hl">Travel Better.</span></h1>
+    <p>AI agents build your perfect itinerary in seconds — with live weather, interactive maps, and real-time attraction data.</p>
+
+    <div class="search-wrap">
+      <input id="search-input" type="text" placeholder="Where do you want to go?" onkeydown="if(event.key==='Enter')planTrip()"/>
+      <button class="btn-primary" onclick="planTrip()">Plan My Trip ✈️</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="num">12+</div><div class="lbl">Destinations</div></div>
+      <div class="stat"><div class="num">30s</div><div class="lbl">Itinerary Time</div></div>
+      <div class="stat"><div class="num">4</div><div class="lbl">AI Agents</div></div>
+      <div class="stat"><div class="num">100%</div><div class="lbl">Free to Use</div></div>
+    </div>
+  </div>
+
+  <div class="data-strip">
+    <span>🌤 Open-Meteo Live Weather</span>
+    <span>🗺 OpenStreetMap Attractions</span>
+    <span>🏨 Real Hotel Data</span>
+    <span>🤖 Local AI (Ollama)</span>
+    <span>📡 100% Real-Time</span>
+  </div>
+
+  <!-- How It Works -->
+  <div class="section">
+    <div class="sec-title">
+      <h2>⚡ How It Works</h2>
+      <p>Four AI agents collaborate in parallel to build your itinerary</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-icon">📝</div>
+        <div class="step-num">Step 01</div>
+        <h3>You Fill the Form</h3>
+        <p>Enter destination, budget, transport mode, interests, and travel dates. Live geocoding confirms your location.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">🤖</div>
+        <div class="step-num">Step 02</div>
+        <h3>AI Agents Run in Parallel</h3>
+        <p>Weather, Attraction, Hotel, and Itinerary agents run simultaneously — fetching live data from open APIs.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">📡</div>
+        <div class="step-num">Step 03</div>
+        <h3>Real Data from Open APIs</h3>
+        <p>Live weather from Open-Meteo, real places from OpenStreetMap, all geocoded with Nominatim. Zero hardcoded data.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">✅</div>
+        <div class="step-num">Step 04</div>
+        <h3>Get Your Full Itinerary</h3>
+        <p>A complete day-by-day plan streams live to your screen — with budget breakdown, packing list, and booking links.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popular Destinations -->
+  <div class="section" style="padding-top:0">
+    <div class="sec-title">
+      <h2>🌍 Popular Destinations</h2>
+      <p>Explore curated trips or search for any city on earth</p>
+    </div>
+    <div class="dest-grid">
+      <div class="dest-card" onclick="go('Paris, France')">
+        <div class="dest-img" style="background:linear-gradient(135deg,#1a237e,#283593)">🗼</div>
+        <div class="dest-body">
+          <h3>Paris, France 🇫🇷</h3>
+          <p>Romance, world-class art, and iconic architecture</p>
+          <button class="btn-primary" onclick="event.stopPropagation();go('Paris, France')">Plan This Trip ✈️</button>
+        </div>
+      </div>
+      <div class="dest-card" onclick="go('Tokyo, Japan')">
+        <div class="dest-img" style="background:linear-gradient(135deg,#b45309,#d97706)">⛩️</div>
+        <div class="dest-body">
+          <h3>Tokyo, Japan 🇯🇵</h3>
+          <p>Tradition meets technology in this vibrant metropolis</p>
+          <button class="btn-primary" onclick="event.stopPropagation();go('Tokyo, Japan')">Plan This Trip ✈️</button>
+        </div>
+      </div>
+      <div class="dest-card" onclick="go('Bali, Indonesia')">
+        <div class="dest-img" style="background:linear-gradient(135deg,#065f46,#059669)">🌺</div>
+        <div class="dest-body">
+          <h3>Bali, Indonesia 🇮🇩</h3>
+          <p>Tropical paradise with temples and rice terraces</p>
+          <button class="btn-primary" onclick="event.stopPropagation();go('Bali, Indonesia')">Plan This Trip ✈️</button>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:36px">
+      <a href="suggestions.html" class="btn-primary" style="padding:14px 36px;font-size:15px">View All 12 Destinations →</a>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <h2>Ready to explore the <span class="cyan">world?</span></h2>
+    <p>Enter any destination and let AI do the planning — completely free, no sign-up needed.</p>
+    <button class="btn-primary" style="padding:16px 40px;font-size:16px" onclick="window.location.href='planner.html'">Start Planning Now →</button>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="logo" style="margin-bottom:8px;font-size:16px">✈️ AI Trip Planner</div>
+        <p style="color:var(--muted);font-size:13px">Powered by AI Agents, OpenStreetMap &amp; Open-Meteo</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="suggestions.html">Suggestions</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="about.html">About</a>
+      </div>
+    </div>
+    <div class="footer-copy">© 2026 AI Trip Planner — Built with ❤️ using AI &amp; Multi-Agent Systems</div>
+  </footer>
+
+  <script>
+    function planTrip(){
+      const v=document.getElementById('search-input').value.trim();
+      window.location.href='planner.html'+(v?'?dest='+encodeURIComponent(v):'');
+    }
+    function go(dest){
+      window.location.href='planner.html?dest='+encodeURIComponent(dest);
+    }
+  </script>
+</body>
+</html>

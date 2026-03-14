@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About — AI Trip Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--cyan:#06b6d4;--cyan2:#22d3ee;--bg:#060d1f;--card:#0f1d35;--border:rgba(255,255,255,0.07);--muted:#64748b;--muted2:#94a3b8}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:#f8fafc;min-height:100vh}
+    h1,h2,h3,h4{font-family:'Outfit',sans-serif}
+    a{text-decoration:none;color:inherit}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:rgba(6,13,31,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .logo{display:flex;align-items:center;gap:8px;font-family:'Outfit',sans-serif;font-weight:700;font-size:18px;color:var(--cyan)}
+    .nav-links{display:flex;gap:32px}
+    .nav-links a{color:var(--muted2);font-size:14px;transition:color .2s}
+    .nav-links a:hover,.nav-links a.active{color:var(--cyan)}
+    .stats-strip{background:linear-gradient(135deg,#0a2040,#0d1f3c);border-bottom:1px solid var(--border);padding:40px;display:flex;justify-content:center;gap:64px;flex-wrap:wrap}
+    .stat{text-align:center}
+    .stat .num{font-family:'Outfit',sans-serif;font-size:40px;font-weight:900;color:var(--cyan)}
+    .stat .lbl{font-size:11px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-top:6px}
+    .section{padding:72px 40px;max-width:1100px;margin:0 auto}
+    .sec-title{text-align:center;margin-bottom:48px}
+    .sec-title h2{font-size:32px;font-weight:800;margin-bottom:10px}
+    .sec-title p{color:var(--muted2);font-size:15px}
+    .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+    .step-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;transition:border-color .2s}
+    .step-card:hover{border-color:rgba(6,182,212,0.3)}
+    .step-icon{font-size:32px;margin-bottom:14px}
+    .step-card h3{font-size:15px;font-weight:700;margin-bottom:8px;color:var(--cyan2)}
+    .step-card p{color:var(--muted2);font-size:12px;line-height:1.65}
+    .tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .tech-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 16px;text-align:center;transition:border-color .2s}
+    .tech-card:hover{border-color:rgba(6,182,212,0.3)}
+    .tech-icon{font-size:28px;margin-bottom:10px}
+    .tech-card h4{font-size:14px;font-weight:700;margin-bottom:6px;color:var(--cyan2)}
+    .tech-card p{color:var(--muted2);font-size:11px;line-height:1.5}
+    .partners{display:flex;flex-wrap:wrap;justify-content:center;gap:14px}
+    .partner-chip{display:flex;align-items:center;gap:8px;border:1px solid var(--border);color:var(--muted2);padding:10px 20px;border-radius:10px;font-size:14px;background:var(--card);transition:all .2s;cursor:pointer}
+    .partner-chip:hover{border-color:var(--cyan);color:var(--cyan)}
+    .project-card{background:var(--card);border:1px solid rgba(6,182,212,0.2);border-radius:20px;padding:36px;max-width:700px;margin:0 auto}
+    .project-card .proj-icon{font-size:48px;text-align:center;margin-bottom:20px}
+    .project-card h3{font-size:22px;font-weight:700;text-align:center;margin-bottom:16px;color:var(--cyan2)}
+    .project-card p{color:var(--muted2);font-size:14px;line-height:1.8;margin-bottom:14px;text-align:center}
+    .tech-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:20px 0}
+    .tech-tag{background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);color:var(--cyan2);padding:5px 14px;border-radius:50px;font-size:12px;font-weight:600}
+    .btn-primary{background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#060d1f;font-weight:700;border:none;border-radius:10px;padding:13px 28px;cursor:pointer;font-size:14px;font-family:'Outfit',sans-serif;transition:opacity .2s;display:inline-block}
+    .btn-primary:hover{opacity:.9}
+    .divider{border:none;border-top:1px solid var(--border);margin:0}
+    footer{background:#050b17;border-top:1px solid var(--border);padding:40px}
+    .footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+    .footer-links{display:flex;gap:24px}
+    .footer-links a{color:var(--muted);font-size:13px;transition:color .2s}
+    .footer-links a:hover{color:white}
+    @media(max-width:900px){.steps-grid,.tech-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:600px){.steps-grid,.tech-grid{grid-template-columns:1fr}.nav-links{display:none}.section{padding:48px 16px}.stats-strip{gap:32px;padding:28px 16px}}
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">✈️ AI Trip Planner</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="about.html" class="active">About</a>
+    </div>
+  </nav>
+
+  <!-- Stats strip -->
+  <div class="stats-strip">
+    <div class="stat"><div class="num">4</div><div class="lbl">AI Agents</div></div>
+    <div class="stat"><div class="num">30s</div><div class="lbl">Avg. Itinerary Time</div></div>
+    <div class="stat"><div class="num">12+</div><div class="lbl">Destinations</div></div>
+    <div class="stat"><div class="num">100%</div><div class="lbl">Open APIs</div></div>
+    <div class="stat"><div class="num">6</div><div class="lbl">Pages</div></div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- How It Works -->
+  <div class="section">
+    <div class="sec-title">
+      <h2>⚙️ How It Works</h2>
+      <p>Four powerful AI agents collaborate in parallel to build your itinerary</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-icon">📝</div>
+        <h3>You Fill the Form</h3>
+        <p>Enter destination, budget, transport, interests, and travel dates. Live geocoding via Nominatim confirms your exact location instantly.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">🤖</div>
+        <h3>AI Agents Run in Parallel</h3>
+        <p>Simultaneously: Weather Agent → Open-Meteo, Attraction Agent → OpenStreetMap, Hotel Agent → Overpass API.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">📡</div>
+        <h3>Real Data from Open APIs</h3>
+        <p>Zero hardcoded content. Live weather, real place names, actual hotel listings — all geocoded with Nominatim in real time.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">✅</div>
+        <h3>Get Your Full Itinerary</h3>
+        <p>A complete day-by-day plan streams live to your browser via SSE — budget breakdown, packing list, and booking links included.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- Tech Stack -->
+  <div class="section">
+    <div class="sec-title">
+      <h2>🛠️ Tech Stack</h2>
+      <p>Built with open-source tools and free APIs</p>
+    </div>
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="tech-icon">⚡</div>
+        <h4>FastAPI</h4>
+        <p>High-performance async Python backend with SSE streaming for real-time itinerary delivery</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🦙</div>
+        <h4>Ollama</h4>
+        <p>Local LLM inference — run Llama3, Mistral or Gemma entirely on your own machine. No API costs.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🗺️</div>
+        <h4>OpenStreetMap</h4>
+        <p>Overpass API for live attraction and hotel data. Nominatim for geocoding any destination on earth.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🌤️</div>
+        <h4>Open-Meteo</h4>
+        <p>Real-time weather data with 5-day forecasts. No API key required. Used for weather agent.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🌍</div>
+        <h4>Leaflet.js</h4>
+        <p>Interactive maps rendered on destination pages with real geocoded coordinates.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">📝</div>
+        <h4>Marked.js</h4>
+        <p>Real-time Markdown-to-HTML rendering for the streaming itinerary output.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🎨</div>
+        <h4>HTML / CSS / JS</h4>
+        <p>Pure vanilla frontend — no React or frameworks. Fast, lightweight, and easy to run anywhere.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">📡</div>
+        <h4>SSE (Server-Sent Events)</h4>
+        <p>Real-time streaming protocol for live itinerary delivery — word by word as the AI generates it.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- Booking Partners -->
+  <div class="section">
+    <div class="sec-title">
+      <h2>✈️ Booking Partners</h2>
+      <p>We link to these trusted platforms for the best deals</p>
+    </div>
+    <div class="partners">
+      <a href="https://www.skyscanner.com" target="_blank" class="partner-chip">✈️ Skyscanner</a>
+      <a href="https://www.irctc.co.in" target="_blank" class="partner-chip">🚂 IRCTC</a>
+      <a href="https://www.booking.com" target="_blank" class="partner-chip">🏨 Booking.com</a>
+      <a href="https://www.redbus.in" target="_blank" class="partner-chip">🚌 Redbus</a>
+      <a href="https://www.makemytrip.com" target="_blank" class="partner-chip">🌐 MakeMyTrip</a>
+      <a href="https://www.goibibo.com" target="_blank" class="partner-chip">🗺️ Goibibo</a>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- The Project -->
+  <div class="section">
+    <div class="sec-title">
+      <h2>🚀 The Project</h2>
+      <p>Designed and developed as a complete full-stack AI application</p>
+    </div>
+    <div class="project-card">
+      <div class="proj-icon">🚀</div>
+      <h3>Built as a Mini Project — AI &amp; Multi-Agent Systems</h3>
+      <p>AI Trip Planner demonstrates the power of multi-agent AI applied to a real-world problem. Four specialized agents run in parallel, each with a distinct role — weather analysis, attraction curation, hotel recommendation, and itinerary synthesis — coordinated by a modern FastAPI backend running local LLMs via Ollama.</p>
+      <p>The frontend is built with pure HTML, CSS, and Vanilla JavaScript — no frameworks overhead. Maps are powered by Leaflet.js and OpenStreetMap, weather by Open-Meteo, and the local AI runs completely offline with zero ongoing API costs.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">Multi-Agent AI</span>
+        <span class="tech-tag">FastAPI</span>
+        <span class="tech-tag">SSE Streaming</span>
+        <span class="tech-tag">Real-time APIs</span>
+        <span class="tech-tag">Open-Meteo</span>
+        <span class="tech-tag">Leaflet.js</span>
+        <span class="tech-tag">Ollama</span>
+        <span class="tech-tag">Mini Project</span>
+      </div>
+      <div style="text-align:center">
+        <a href="planner.html" class="btn-primary">Start Planning Your Trip →</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="logo" style="margin-bottom:6px">✈️ AI Trip Planner</div>
+        <p style="color:var(--muted);font-size:13px">Powered by AI Agents, OpenStreetMap &amp; Open-Meteo</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="suggestions.html">Suggestions</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="about.html">About</a>
+      </div>
+    </div>
+    <div style="max-width:1100px;margin:24px auto 0;padding-top:24px;border-top:1px solid var(--border);text-align:center;color:var(--muted);font-size:12px">
+      © 2026 AI Trip Planner — Built with ❤️ using AI &amp; Multi-Agent Systems
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plan Your Trip — AI Trip Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root{--cyan:#06b6d4;--cyan2:#22d3ee;--bg:#060d1f;--card:#0f1d35;--card2:#142240;--border:rgba(255,255,255,0.08);--muted:#64748b;--muted2:#94a3b8}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:#f8fafc;min-height:100vh}
+    h1,h2,h3{font-family:'Outfit',sans-serif}
+    a{text-decoration:none;color:inherit}
+    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:rgba(6,13,31,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .logo{display:flex;align-items:center;gap:8px;font-family:'Outfit',sans-serif;font-weight:700;font-size:18px;color:var(--cyan)}
+    .nav-links{display:flex;gap:32px}
+    .nav-links a{color:var(--muted2);font-size:14px;transition:color .2s}
+    .nav-links a:hover,.nav-links a.active{color:var(--cyan)}
+    .page-header{text-align:center;padding:56px 24px 40px;background:radial-gradient(ellipse at 50% 0%,rgba(6,182,212,0.06) 0%,transparent 60%)}
+    .page-header h1{font-size:clamp(28px,4vw,44px);font-weight:800;margin-bottom:10px}
+    .page-header h1 span{background:linear-gradient(90deg,var(--cyan),var(--cyan2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .page-header p{color:var(--muted2);font-size:15px}
+    .form-wrap{max-width:760px;margin:0 auto;padding:0 24px 60px}
+    .form-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px;margin-bottom:0}
+    .field-group{margin-bottom:22px}
+    .field-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+    .field-label span{font-size:14px}
+    .field-input{width:100%;background:rgba(255,255,255,0.04);border:1.5px solid var(--border);border-radius:12px;padding:13px 16px;color:#f8fafc;font-size:15px;font-family:'Inter',sans-serif;transition:border-color .2s,background .2s;outline:none}
+    .field-input:focus{border-color:rgba(6,182,212,0.5);background:rgba(6,182,212,0.03)}
+    .field-input::placeholder{color:var(--muted)}
+    .geocode-status{display:flex;align-items:center;gap:8px;font-size:13px;margin-top:8px;min-height:20px;transition:all .3s}
+    .geocode-status.ok{color:var(--cyan)}
+    .geocode-status.err{color:#ef4444}
+    .geocode-status.loading{color:var(--muted2)}
+    #mini-map{height:180px;border-radius:12px;overflow:hidden;margin-top:12px;display:none;border:1px solid var(--border)}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    select.field-input{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+    .interests-grid{display:flex;flex-wrap:wrap;gap:8px}
+    .interest-chip{border:1.5px solid var(--border);color:var(--muted2);padding:8px 16px;border-radius:10px;font-size:13px;cursor:pointer;transition:all .2s;background:transparent;user-select:none}
+    .interest-chip.active{background:rgba(6,182,212,0.12);border-color:var(--cyan);color:var(--cyan2)}
+    .divider{border:none;border-top:1px solid var(--border);margin:24px 0}
+    .btn-generate{width:100%;background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#060d1f;font-weight:800;border:none;border-radius:14px;padding:18px;cursor:pointer;font-size:17px;font-family:'Outfit',sans-serif;transition:all .2s;margin-top:8px}
+    .btn-generate:hover{opacity:.92;transform:translateY(-1px)}
+    .error-msg{color:#ef4444;font-size:13px;margin-top:6px;display:none}
+    textarea.field-input{resize:vertical;min-height:90px}
+    .dist-tag{display:none; font-size: 12px; color: var(--cyan); margin-top: 10px; font-weight: 600; padding: 8px 12px; background: rgba(6,182,212,0.1); border-radius: 8px; border: 1px solid rgba(6,182,212,0.2);}
+    @media(max-width:600px){.two-col{grid-template-columns:1fr}.nav-links{display:none}.form-card{padding:24px}}
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">✈️ AI Trip Planner</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="suggestions.html">Suggestions</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="about.html">About</a>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <h1>Build Your <span>Perfect Trip</span></h1>
+    <p>Personalized routes from your home to the world — in ~30 seconds</p>
+  </div>
+
+  <div class="form-wrap">
+    <div class="form-card">
+
+      <div class="two-col">
+        <div class="field-group">
+          <div class="field-label"><span>🏠</span> Departing From</div>
+          <input id="origin" type="text" class="field-input" placeholder="Your home city..." autocomplete="off"/>
+          <div class="geocode-status" id="origin-status"></div>
+        </div>
+        <div class="field-group">
+          <div class="field-label"><span>📍</span> Destination</div>
+          <input id="dest" type="text" class="field-input" placeholder="Where to?" autocomplete="off"/>
+          <div class="geocode-status" id="geo-status"></div>
+        </div>
+      </div>
+      
+      <div id="dist-info" class="dist-tag"></div>
+      <div id="mini-map"></div>
+
+      <div class="two-col" style="margin-top:20px">
+        <div class="field-group">
+          <div class="field-label"><span>📅</span> Start Date</div>
+          <input id="start-date" type="date" class="field-input"/>
+        </div>
+        <div class="field-group">
+          <div class="field-label"><span>⏳</span> Duration (Days)</div>
+          <input id="days" type="number" class="field-input" min="1" max="30" value="5"/>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label"><span>📅</span> Return Date (Auto)</div>
+        <input id="end-date" type="date" class="field-input" readonly style="opacity: 0.7; cursor: not-allowed; background: rgba(0,0,0,0.2)"/>
+      </div>
+
+      <div class="two-col">
+        <div class="field-group">
+          <div class="field-label"><span>💰</span> Preferred Currency</div>
+          <select id="currency" class="field-input">
+            <option value="INR">₹ Indian Rupee (INR)</option>
+            <option value="USD">$ US Dollar (USD)</option>
+            <option value="EUR">€ Euro (EUR)</option>
+            <option value="GBP">£ British Pound (GBP)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label"><span>🏨</span> Hotel Budget</div>
+          <select id="budget" class="field-input">
+            <option value="Budget">🎒 Budget</option>
+            <option value="Mid-range" selected>✈️ Mid-range</option>
+            <option value="Luxury">💎 Luxury</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label"><span>🚗</span> Primary Transport</div>
+        <select id="transport" class="field-input">
+          <option value="Mix">🔀 Mix (Flight + Local Transport)</option>
+          <option id="opt-flight" value="Flight">✈️ Flight Only</option>
+          <option value="Train">🚂 Train / Rail</option>
+          <option value="Rental Car">🚗 Rental Car / Roadtrip</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label"><span>🎯</span> Interests</div>
+        <div class="interests-grid" id="interests-grid">
+          <button class="interest-chip" onclick="toggleChip(this)">🌿 Nature</button>
+          <button class="interest-chip" onclick="toggleChip(this)">🏛️ History</button>
+          <button class="interest-chip" onclick="toggleChip(this)">🍽️ Food</button>
+          <button class="interest-chip" onclick="toggleChip(this)">⛺ Adventure</button>
+          <button class="interest-chip" onclick="toggleChip(this)">🧘 Wellness</button>
+          <button class="interest-chip" onclick="toggleChip(this)">📸 Photo</button>
+          <button class="interest-chip" onclick="toggleChip(this)">🏖️ Beaches</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label"><span>✏️</span> Special Requirements</div>
+        <textarea id="requirements" class="field-input" placeholder="e.g. Vegetarian meals, travelling with kids..."></textarea>
+      </div>
+
+      <button class="btn-generate" id="generate-btn" onclick="generate()">
+        Generate My Trip ✈️
+      </button>
+      <div class="error-msg" id="dest-err">Please enter a destination</div>
+    </div>
+  </div>
+
+  <footer style="background:#050b17;border-top:1px solid var(--border);padding:32px 40px;display:flex;justify-content:space-between;align-items:center">
+    <div class="logo" style="font-size:15px">✈️ AI Trip Planner</div>
+    <div style="display:flex;gap:24px;color:var(--muted);font-size:13px">
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+    </div>
+  </footer>
+
+  <script>
+    let geoLat=null, geoLon=null, originLat=null, originLon=null, geoTimer, originTimer;
+
+    // --- ON LOAD: Check for URL Parameters ---
+    window.onload = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlDest = urlParams.get('dest');
+      if (urlDest) {
+        document.getElementById('dest').value = urlDest;
+        geocode(urlDest, 'dest');
+      }
+    };
+
+    // --- DATE AUTO-SYNC LOGIC ---
+    const startInput = document.getElementById('start-date');
+    const daysInput = document.getElementById('days');
+    const endInput = document.getElementById('end-date');
+
+    const today = new Date().toISOString().split('T')[0];
+    startInput.value = today;
+    startInput.min = today;
+
+    function syncDates() {
+      const start = new Date(startInput.value);
+      const days = parseInt(daysInput.value) || 1;
+      if (!isNaN(start.getTime())) {
+        const end = new Date(start);
+        end.setDate(start.getDate() + days);
+        endInput.value = end.toISOString().split('T')[0];
+      }
+    }
+
+    startInput.addEventListener('change', syncDates);
+    daysInput.addEventListener('input', syncDates);
+    syncDates();
+
+    // --- SMART DISTANCE LOGIC ---
+    function getDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; 
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+      return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+    }
+
+    function checkSmartTransport() {
+      if (originLat && geoLat) {
+        const dist = Math.round(getDistance(originLat, originLon, geoLat, geoLon));
+        const info = document.getElementById('dist-info');
+        const flight = document.getElementById('opt-flight');
+        const select = document.getElementById('transport');
+
+        info.style.display = 'block';
+        info.textContent = `📏 Estimated Distance: ~${dist} km`;
+
+        if (dist < 450) {
+          info.innerHTML += ` <span style="color:#fca5a5">(Short distance: Rail/Road suggested)</span>`;
+          flight.textContent = "✈️ Flight (Not Recommended)";
+          if(select.value === "Flight") select.value = "Mix";
+        } else {
+          flight.textContent = "✈️ Flight Only";
+        }
+      }
+    }
+
+    // --- GEOCODING ---
+    async function geocode(q, type) {
+      const statusEl = type === 'origin' ? document.getElementById('origin-status') : document.getElementById('geo-status');
+      statusEl.textContent = '🔍 Locating...';
+      statusEl.className = 'geocode-status loading';
+
+      try {
+        const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`);
+        const d = await r.json();
+        if (d.length) {
+          const lat = parseFloat(d[0].lat);
+          const lon = parseFloat(d[0].lon);
+          if (type === 'origin') { 
+            originLat = lat; originLon = lon; 
+          } else { 
+            geoLat = lat; geoLon = lon; 
+            showMiniMap(lat, lon); 
+          }
+          statusEl.textContent = `✅ Found: ${d[0].display_name.split(',')[0]}`;
+          statusEl.className = 'geocode-status ok';
+          checkSmartTransport();
+        } else {
+          statusEl.textContent = '❌ Not found';
+          statusEl.className = 'geocode-status err';
+        }
+      } catch (e) { statusEl.textContent = '⚠️ Error'; }
+    }
+
+    document.getElementById('origin').addEventListener('input', e => {
+      clearTimeout(originTimer);
+      originTimer = setTimeout(() => geocode(e.target.value, 'origin'), 800);
+    });
+
+    document.getElementById('dest').addEventListener('input', e => {
+      clearTimeout(geoTimer);
+      geoTimer = setTimeout(() => geocode(e.target.value, 'dest'), 800);
+    });
+
+    let map;
+    function showMiniMap(lat, lon) {
+      document.getElementById('mini-map').style.display = 'block';
+      if (!map) {
+        map = L.map('mini-map', {zoomControl: false}).setView([lat, lon], 11);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+      } else { map.setView([lat, lon], 11); }
+      map.eachLayer(l => { if(l instanceof L.Marker) map.removeLayer(l); });
+      L.marker([lat, lon]).addTo(map);
+    }
+
+    function toggleChip(el) { el.classList.toggle('active'); }
+
+    function generate() {
+      const destInput = document.getElementById('dest').value.trim();
+      const originInput = document.getElementById('origin').value.trim();
+      if(!destInput) { document.getElementById('dest-err').style.display='block'; return; }
+
+      const settings = {
+        origin: originInput || 'Current Location',
+        destination: destInput,
+        days: daysInput.value,
+        startDate: startInput.value,
+        endDate: endInput.value,
+        currency: document.getElementById('currency').value,
+        symbol: document.getElementById('currency').selectedOptions[0].text.split(' ')[0],
+        transport: document.getElementById('transport').value,
+        budget: document.getElementById('budget').value,
+        interests: [...document.querySelectorAll('.interest-chip.active')].map(c => c.textContent.trim()),
+        requirements: document.getElementById('requirements').value,
+        lat: geoLat, lon: geoLon
+      };
+
+      localStorage.setItem('tripSettings', JSON.stringify(settings));
+      document.getElementById('generate-btn').textContent = 'Generating... ✈️';
+      window.location.href = 'itinerary.html';
+    }
+  </script>
+</body>
+</html>
