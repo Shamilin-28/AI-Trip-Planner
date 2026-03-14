@@ -341,7 +341,7 @@
       breaks: false,   // DON'T convert single \n → <br> — ruins table rows
     });
 
-    const BACKEND = 'https://ai-trip-planner-p4c3.onrender.com/'; //localhost url: http://127.0.0.1:8000/ (use this if running locally)
+    const BACKEND = 'http://127.0.0.1:8000/' // Renderurl: 'https://ai-trip-planner-p4c3.onrender.com/'; localhost url: http://127.0.0.1:8000/ (use this if running locally)
     const s = JSON.parse(localStorage.getItem('tripSettings') || '{}');
 
     const dest     = s.destination || s.destInput || 'Unknown';
