@@ -79,7 +79,7 @@ python -m venv venv
 # If you get an execution policy error:
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 
-uvicorn main:app --reload --port 8000
+python -m uvicorn main:app --reload --port 8000
 # You should see: INFO: Uvicorn running on http://127.0.0.1:8000
 ```
 
