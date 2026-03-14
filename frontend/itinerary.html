@@ -647,7 +647,7 @@
     const BACKEND =
       location.hostname === "localhost" || location.hostname === "127.0.0.1"
         ? "http://127.0.0.1:8000"
-        : "https://ai-trip-planner-p4c3.onrender.com";
+        : "http://127.0.0.1:8000"; //render url: "https://ai-trip-planner-p4c3.onrender.com"
         
     const s = JSON.parse(localStorage.getItem('tripSettings') || '{}');
 
